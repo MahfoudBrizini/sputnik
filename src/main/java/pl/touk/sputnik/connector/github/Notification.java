@@ -2,7 +2,9 @@ package pl.touk.sputnik.connector.github;
 
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Optional;
+import com.jcabi.github.Assignees;
 import com.jcabi.github.Issues;
+import com.jcabi.github.User;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -78,5 +80,14 @@ class Notification {
             log.error("Error adding an issue to Github", e);
         }
         return Optional.absent();
+    }
+
+    public void logAssigneesEmails(Optional<Integer> issueId) {
+        if (issueId.isPresent()) {
+            Assignees assignees = issues.get(issueId.get()).repo().assignees();
+            for (User user : assignees.iterate()) {
+                log.info("Assignee email {}", user.emails());
+            }
+        }
     }
 }

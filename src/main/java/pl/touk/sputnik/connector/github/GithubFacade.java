@@ -61,10 +61,12 @@ public class GithubFacade implements ConnectorFacade {
     @Override
     public void publish(Review review) {
         ReviewStatus reviewStatus = new ReviewStatus(review);
-        Optional<Integer> issueId = new Notification(repo.issues(), new ContentRenderer())
-                .upsertComment(reviewStatus);
+        Notification notification = new Notification(repo.issues(), new ContentRenderer());
+        Optional<Integer> issueId = notification.upsertComment(reviewStatus);
+        notification.logAssigneesEmails(issueId);
         new Status(getPull(), review, issueId).update();
     }
+
 
     private Pull getPull() {
         return repo.pulls().get(patchset.getPullRequestId());

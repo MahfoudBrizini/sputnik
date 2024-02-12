@@ -32,9 +32,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.OPTIONAL;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.eq;
 
 @ExtendWith(MockitoExtension.class)
 class GithubFacadeTest {
@@ -63,6 +66,9 @@ class GithubFacadeTest {
 
     @Mock
     private Statuses statuses;
+
+    @Mock
+    private Notification notifications;
 
     private GithubFacade githubFacade;
     private Configuration config;
@@ -99,6 +105,21 @@ class GithubFacadeTest {
         githubFacade.setReview(review);
 
         verify(statuses).create(any(Statuses.StatusCreate.class));
+    }
+
+    @Test
+    void shouldLogEmails() {
+        when(commit.sha()).thenReturn("sha1");
+        when(commits.statuses("sha1")).thenReturn(statuses);
+
+        String filename = "src/main/java/Main.java";
+        Review review = new Review(ImmutableList.of(new ReviewFile(filename)), ReviewFormatterFactory.get(config));
+        review.addError("checkstyle", new Violation(filename, 1, "error message", Severity.ERROR));
+        review.getMessages().add("Total 1 violations found");
+
+        githubFacade.setReview(review);
+
+        verify(notifications).logAssigneesEmails(any());
     }
 
     private Iterable<Commit> pullCommits() {
