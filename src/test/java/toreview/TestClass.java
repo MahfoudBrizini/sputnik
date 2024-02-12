@@ -10,7 +10,7 @@ class TestClass {
         if (value = true) {
             //do Something
         } else {
-            //else Do Something
+            //else Do Somet
         }
     }
 }
