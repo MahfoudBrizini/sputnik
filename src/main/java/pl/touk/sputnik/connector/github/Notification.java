@@ -81,13 +81,4 @@ class Notification {
         }
         return Optional.absent();
     }
-
-    public void logAssigneesEmails(Optional<Integer> issueId) {
-        if (issueId.isPresent()) {
-            Assignees assignees = issues.get(issueId.get()).repo().assignees();
-            for (User user : assignees.iterate()) {
-                log.info("Assignee email {}", user.emails());
-            }
-        }
-    }
 }

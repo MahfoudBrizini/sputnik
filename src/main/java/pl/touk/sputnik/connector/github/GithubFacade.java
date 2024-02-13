@@ -2,8 +2,7 @@ package pl.touk.sputnik.connector.github;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Optional;
-import com.jcabi.github.Pull;
-import com.jcabi.github.Repo;
+import com.jcabi.github.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -61,12 +60,19 @@ public class GithubFacade implements ConnectorFacade {
     @Override
     public void publish(Review review) {
         ReviewStatus reviewStatus = new ReviewStatus(review);
-        Notification notification = new Notification(repo.issues(), new ContentRenderer());
-        Optional<Integer> issueId = notification.upsertComment(reviewStatus);
-        notification.logAssigneesEmails(issueId);
+        Optional<Integer> issueId = new Notification(repo.issues(), new ContentRenderer()).upsertComment(reviewStatus);
+        logAssigneesEmails(issueId);
         new Status(getPull(), review, issueId).update();
     }
 
+    public void logAssigneesEmails(Optional<Integer> issueId) {
+        if (issueId.isPresent()) {
+            Assignees assignees = repo.issues().get(issueId.get()).repo().assignees();
+            for (User user : assignees.iterate()) {
+                log.info("Assignee email {}", user.emails());
+            }
+        }
+    }
 
     private Pull getPull() {
         return repo.pulls().get(patchset.getPullRequestId());

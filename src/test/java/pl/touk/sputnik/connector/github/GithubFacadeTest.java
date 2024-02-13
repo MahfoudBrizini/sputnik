@@ -36,7 +36,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.OPTIONAL;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.eq;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +68,7 @@ class GithubFacadeTest {
     private Statuses statuses;
 
     @Mock
-    private Notification notifications;
+    private  Notification notification;
 
     private GithubFacade githubFacade;
     private Configuration config;
@@ -109,6 +109,8 @@ class GithubFacadeTest {
 
     @Test
     void shouldLogEmails() {
+        GithubFacade spyGithubFacade = spy(githubFacade);
+
         when(commit.sha()).thenReturn("sha1");
         when(commits.statuses("sha1")).thenReturn(statuses);
 
@@ -117,9 +119,8 @@ class GithubFacadeTest {
         review.addError("checkstyle", new Violation(filename, 1, "error message", Severity.ERROR));
         review.getMessages().add("Total 1 violations found");
 
-        githubFacade.setReview(review);
-
-        verify(notifications).logAssigneesEmails(any());
+        spyGithubFacade.setReview(review);
+        verify(spyGithubFacade).logAssigneesEmails(any());
     }
 
     private Iterable<Commit> pullCommits() {
