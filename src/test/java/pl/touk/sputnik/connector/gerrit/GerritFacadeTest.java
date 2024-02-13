@@ -18,12 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import com.google.gson.stream.JsonReader;
 import pl.touk.sputnik.configuration.Configuration;
 import pl.touk.sputnik.review.Review;
 import pl.touk.sputnik.review.ReviewFile;
 import pl.touk.sputnik.review.ReviewFormatter;
-
+import java.util.HashMap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,18 +52,21 @@ class GerritFacadeTest {
 
     @Test
     void shouldParseListFilesResponse() throws IOException, RestApiException {
+
         List<ReviewFile> reviewFiles = createGerritFacade().listFiles();
         assertThat(reviewFiles).isNotEmpty();
     }
 
     @Test
     void shouldNotListDeletedFiles() throws IOException, RestApiException {
+
         List<ReviewFile> reviewFiles = createGerritFacade().listFiles();
         assertThat(reviewFiles).hasSize(1);
     }
 
     @Test
     void shouldCallGerritApiOnPublish() throws IOException, RestApiException {
+
         when(gerritOptions.isOmitDuplicateComments()).thenReturn(true);
         Review review = new Review(new ArrayList<>(), new ReviewFormatter(configuration));
         ArgumentCaptor<ReviewInput> reviewInputCaptor = ArgumentCaptor.forClass(ReviewInput.class);
@@ -77,6 +80,7 @@ class GerritFacadeTest {
 
     @Test
     void shouldRevisionApiBeConfigured() throws IOException, RestApiException {
+
         GerritFacade gerritFacade = createGerritFacade();
 
         assertThat(gerritFacade.getRevision())
@@ -85,6 +89,7 @@ class GerritFacadeTest {
 
     @Test
     void shouldReviewDelegateToPublish() throws IOException, RestApiException {
+
         Review review = new Review(new ArrayList<>(), new ReviewFormatter(configuration));
 
         createGerritFacade().setReview(review);
@@ -93,6 +98,7 @@ class GerritFacadeTest {
     }
 
     private GerritFacade createGerritFacade() throws IOException, RestApiException {
+
         @SuppressWarnings("UnstableApiUsage")
         String listFilesJson = Resources.toString(Resources.getResource("json/gerrit-listfiles.json"), Charsets.UTF_8);
         JsonElement jsonElement = new JsonParser().parse(listFilesJson);

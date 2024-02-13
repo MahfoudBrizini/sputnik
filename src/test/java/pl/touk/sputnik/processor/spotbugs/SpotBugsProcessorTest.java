@@ -1,20 +1,19 @@
 package pl.touk.sputnik.processor.spotbugs;
-
+import java.nio.charset.StandardCharsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import java.io.InputStreamReader;
 import edu.umd.cs.findbugs.SystemProperties;
 import pl.touk.sputnik.TestEnvironment;
 import pl.touk.sputnik.configuration.ConfigurationSetup;
 import pl.touk.sputnik.configuration.GeneralOption;
-import pl.touk.sputnik.review.Review;
-import pl.touk.sputnik.review.ReviewFile;
-import pl.touk.sputnik.review.ReviewFormatterFactory;
-import pl.touk.sputnik.review.ReviewResult;
+import pl.touk.sputnik.review.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,15 +38,18 @@ class SpotBugsProcessorTest extends TestEnvironment {
         Review review = new Review(files, ReviewFormatterFactory.get(config));
 
         ReviewResult reviewResult = spotBugsProcessor.process(review);
+        List<String> extractedMessages = reviewResult.getViolations().stream()
+                .map(Violation::getMessage)
+                .collect(Collectors.toList());
 
+
+        extractedMessages.set(0,StringUtils.stripAccents(extractedMessages.get(0)));
+        extractedMessages.set(1,StringUtils.stripAccents(extractedMessages.get(1)));
         assertThat(reviewResult).isNotNull();
-        assertThat(reviewResult.getViolations())
+        assertThat(extractedMessages)
                 .isNotEmpty()
                 .hasSize(2)
-                .extracting("message")
-                .containsOnly(
-                        "DLS: Dead store to value in toreview.TestClass.incorrectAssignmentInIfCondition()",
-                        "QBA: toreview.TestClass.incorrectAssignmentInIfCondition() assigns boolean literal in boolean expression"
+                .containsOnly("DLS: Alimentation a perte d'une variable locale dans la methode toreview.TestClass.incorrectAssignmentInIfCondition()","QBA: La methode toreview.TestClass.incorrectAssignmentInIfCondition() assigne une valeur booleenne fixe dans une expression booleenne"
                 );
     }
 

@@ -1,5 +1,5 @@
 package pl.touk.sputnik.review;
-
+import java.io.InputStreamReader;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
