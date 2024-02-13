@@ -2,7 +2,9 @@ package pl.touk.sputnik.connector.github;
 
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Optional;
+import com.jcabi.github.Assignees;
 import com.jcabi.github.Issues;
+import com.jcabi.github.User;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
