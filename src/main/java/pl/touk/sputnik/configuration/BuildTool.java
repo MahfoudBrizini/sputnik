@@ -1,7 +1,7 @@
 package pl.touk.sputnik.configuration;
 
 public enum BuildTool {
-
+    //meow
     MAVEN("maven"), GRADLE("gradle");
 
     private final String name;
